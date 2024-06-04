@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class GameLife extends JFrame {
     private static final int MAP_SIZE = 30;
@@ -141,16 +143,73 @@ public class GameLife extends JFrame {
     }
 
     private void initializeCells() {
+        boolean[][] cellChanged = new boolean[MAP_SIZE][MAP_SIZE];
+
         for (int i = 0; i < MAP_SIZE; i++) {
             for (int j = 0; j < MAP_SIZE; j++) {
                 JButton button = new JButton();
                 button.setPreferredSize(new Dimension(CELL_SIZE, CELL_SIZE));
                 button.setBackground(Color.WHITE);
                 button.setBounds(j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-                button.addActionListener(this::cellClicked);
+
+                final int x = i;
+                final int y = j;
+
+                button.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        if (e.getButton() == MouseEvent.BUTTON1) {
+                            toggleCellState(x, y);
+                            cellChanged[x][y] = true;
+                        }
+                    }
+
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                        cellChanged[x][y] = false;
+                    }
+
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        // Проверяем, зажата ли правая кнопка мыши
+                        if (SwingUtilities.isRightMouseButton(e) && !cellChanged[x][y]) {
+                            toggleCellState(x, y);
+                            cellChanged[x][y] = true;
+                        }
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        cellChanged[x][y] = false;
+                    }
+                });
+
+                button.addMouseMotionListener(new MouseAdapter() {
+                    @Override
+                    public void mouseDragged(MouseEvent e) {
+                        if (SwingUtilities.isLeftMouseButton(e)) {
+                            JButton btn = (JButton) e.getSource();
+                            Point point = SwingUtilities.convertPoint(btn, e.getPoint(), btn.getParent());
+                            int cellX = point.y / CELL_SIZE;
+                            int cellY = point.x / CELL_SIZE;
+                            if (!cellChanged[cellX][cellY]) {
+                                toggleCellState(cellX, cellY);
+                                cellChanged[cellX][cellY] = true;
+                            }
+                        }
+                    }
+                });
+
                 add(button);
                 cells[i][j] = button;
             }
+        }
+    }
+
+    private void toggleCellState(int x, int y) {
+        if (!isPlaying) {
+            currentState[x][y] ^= 1;
+            cells[x][y].setBackground(currentState[x][y] == 1 ? Color.BLACK : Color.WHITE);
         }
     }
 
