@@ -8,15 +8,21 @@ public class GameLife extends JFrame {
     private static final int CELL_SIZE = 20;
     private static final int TIMER_INTERVAL = 100;
 
-    private int[][] currentState = new int[MAP_SIZE][MAP_SIZE];
-    private int[][] nextState = new int[MAP_SIZE][MAP_SIZE];
-    private JButton[][] cells = new JButton[MAP_SIZE][MAP_SIZE];
-    private boolean isPlaying = false;
+    private int[][] currentState;
+    private int[][] nextState;
+    private JButton[][] cells;
+    private boolean isPlaying;
     private Timer mainTimer;
 
     public GameLife() {
+        currentState = new int[MAP_SIZE][MAP_SIZE];
+        nextState = new int[MAP_SIZE][MAP_SIZE];
+        cells = new JButton[MAP_SIZE][MAP_SIZE];
+        isPlaying = false;
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
+
         initializeGame();
         setFormSize();
         buildMenu();
@@ -36,12 +42,7 @@ public class GameLife extends JFrame {
     }
 
     private void initializeTimer() {
-        mainTimer = new Timer(TIMER_INTERVAL, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateStates();
-            }
-        });
+        mainTimer = new Timer(TIMER_INTERVAL, e -> updateStates());
     }
 
     private void clearGame() {
@@ -52,35 +53,21 @@ public class GameLife extends JFrame {
         resetCells();
     }
 
-    private void resetCells() {
-        for (int i = 0; i < MAP_SIZE; i++) {
-            for (int j = 0; j < MAP_SIZE; j++) {
-                cells[i][j].setBackground(Color.WHITE);
-            }
-        }
-    }
-
     private void buildMenu() {
         JMenuBar menuBar = new JMenuBar();
         JMenu menu = new JMenu("Game");
         JMenuItem restartMenuItem = new JMenuItem("Начать заного");
         JMenuItem playMenuItem = new JMenuItem("Начать симуляцию");
 
-        restartMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                mainTimer.stop();
-                clearGame();
-            }
+        restartMenuItem.addActionListener(e -> {
+            mainTimer.stop();
+            clearGame();
         });
 
-        playMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (!isPlaying) {
-                    isPlaying = true;
-                    mainTimer.start();
-                }
+        playMenuItem.addActionListener(e -> {
+            if (!isPlaying) {
+                isPlaying = true;
+                mainTimer.start();
             }
         });
 
@@ -100,9 +87,9 @@ public class GameLife extends JFrame {
     }
 
     private boolean isGenerationDead() {
-        for (int i = 0; i < MAP_SIZE; i++) {
-            for (int j = 0; j < MAP_SIZE; j++) {
-                if (currentState[i][j] == 1)
+        for (int[] row : currentState) {
+            for (int cell : row) {
+                if (cell == 1)
                     return false;
             }
         }
@@ -160,14 +147,17 @@ public class GameLife extends JFrame {
                 button.setPreferredSize(new Dimension(CELL_SIZE, CELL_SIZE));
                 button.setBackground(Color.WHITE);
                 button.setBounds(j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-                button.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        cellClicked(e);
-                    }
-                });
+                button.addActionListener(this::cellClicked);
                 add(button);
                 cells[i][j] = button;
+            }
+        }
+    }
+
+    private void resetCells() {
+        for (JButton[] row : cells) {
+            for (JButton cell : row) {
+                cell.setBackground(Color.WHITE);
             }
         }
     }
@@ -183,14 +173,12 @@ public class GameLife extends JFrame {
         }
     }
 
+
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                GameLife frame = new GameLife();
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.setVisible(true);
-            }
+        SwingUtilities.invokeLater(() -> {
+            GameLife frame = new GameLife();
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setVisible(true);
         });
     }
 }
