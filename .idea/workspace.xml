@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cdb5ed43-4af8-4b83-a282-0394ae5e6d86" name="Changes" comment=":0">
+    <list default="true" id="cdb5ed43-4af8-4b83-a282-0394ae5e6d86" name="Changes" comment="just ashal">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GameLife.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/GameLife.java" afterDir="false" />
     </list>
@@ -91,12 +91,21 @@
       <option name="project" value="LOCAL" />
       <updated>1717507872857</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="just ashal">
+      <option name="closed" value="true" />
+      <created>1717520461786</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1717520461786</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value=":O" />
     <MESSAGE value=":0" />
-    <option name="LAST_COMMIT_MESSAGE" value=":0" />
+    <MESSAGE value="just ashal" />
+    <option name="LAST_COMMIT_MESSAGE" value="just ashal" />
   </component>
 </project>

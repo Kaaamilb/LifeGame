@@ -28,11 +28,19 @@ public class GameLife extends JFrame {
         initializeGame();
         setFormSize();
         buildMenu();
-        getContentPane().setBackground(Color.BLACK);
+       // getContentPane().setBackground(Color.BLACK);
     }
 
     private void setFormSize() {
-        setSize((MAP_SIZE + 1) * CELL_SIZE, (MAP_SIZE + 1) * CELL_SIZE + 42);
+        Dimension gameFieldSize = new Dimension(MAP_SIZE * CELL_SIZE, (MAP_SIZE + 1) * CELL_SIZE);
+        getContentPane().setPreferredSize(gameFieldSize);
+
+
+        pack();
+
+        setLocationRelativeTo(null);
+
+        setResizable(false);
     }
 
     private void initializeGame() {
@@ -144,66 +152,67 @@ public class GameLife extends JFrame {
 
     private void initializeCells() {
         boolean[][] cellChanged = new boolean[MAP_SIZE][MAP_SIZE];
-
         for (int i = 0; i < MAP_SIZE; i++) {
             for (int j = 0; j < MAP_SIZE; j++) {
-                JButton button = new JButton();
-                button.setPreferredSize(new Dimension(CELL_SIZE, CELL_SIZE));
-                button.setBackground(Color.WHITE);
-                button.setBounds(j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-
-                final int x = i;
-                final int y = j;
-
-                button.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        if (e.getButton() == MouseEvent.BUTTON1) {
-                            toggleCellState(x, y);
-                            cellChanged[x][y] = true;
-                        }
-                    }
-
-                    @Override
-                    public void mouseReleased(MouseEvent e) {
-                        cellChanged[x][y] = false;
-                    }
-
-                    @Override
-                    public void mouseEntered(MouseEvent e) {
-                        // Проверяем, зажата ли правая кнопка мыши
-                        if (SwingUtilities.isRightMouseButton(e) && !cellChanged[x][y]) {
-                            toggleCellState(x, y);
-                            cellChanged[x][y] = true;
-                        }
-                    }
-
-                    @Override
-                    public void mouseExited(MouseEvent e) {
-                        cellChanged[x][y] = false;
-                    }
-                });
-
-                button.addMouseMotionListener(new MouseAdapter() {
-                    @Override
-                    public void mouseDragged(MouseEvent e) {
-                        if (SwingUtilities.isLeftMouseButton(e)) {
-                            JButton btn = (JButton) e.getSource();
-                            Point point = SwingUtilities.convertPoint(btn, e.getPoint(), btn.getParent());
-                            int cellX = point.y / CELL_SIZE;
-                            int cellY = point.x / CELL_SIZE;
-                            if (!cellChanged[cellX][cellY]) {
-                                toggleCellState(cellX, cellY);
-                                cellChanged[cellX][cellY] = true;
-                            }
-                        }
-                    }
-                });
-
-                add(button);
-                cells[i][j] = button;
+                cells[i][j] = createCell(i, j, cellChanged);
             }
         }
+    }
+
+    private JButton createCell(int x, int y, boolean[][] cellChanged) {
+        JButton button = new JButton();
+        button.setPreferredSize(new Dimension(CELL_SIZE, CELL_SIZE));
+        button.setBackground(Color.WHITE);
+        button.setBounds(y * CELL_SIZE, x * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        addCellListeners(button, x, y, cellChanged);
+        add(button);
+        return button;
+    }
+
+    private void addCellListeners(JButton button, int x, int y, boolean[][] cellChanged) {
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    toggleCellState(x, y);
+                    cellChanged[x][y] = true;
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                cellChanged[x][y] = false;
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e) && !cellChanged[x][y]) {
+                    toggleCellState(x, y);
+                    cellChanged[x][y] = true;
+                }
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                cellChanged[x][y] = false;
+            }
+        });
+
+        button.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    JButton btn = (JButton) e.getSource();
+                    Point point = SwingUtilities.convertPoint(btn, e.getPoint(), btn.getParent());
+                    int cellX = point.y / CELL_SIZE;
+                    int cellY = point.x / CELL_SIZE;
+                    if (!cellChanged[cellX][cellY]) {
+                        toggleCellState(cellX, cellY);
+                        cellChanged[cellX][cellY] = true;
+                    }
+                }
+            }
+        });
     }
 
     private void toggleCellState(int x, int y) {
@@ -218,17 +227,6 @@ public class GameLife extends JFrame {
             for (JButton cell : row) {
                 cell.setBackground(Color.WHITE);
             }
-        }
-    }
-
-    private void cellClicked(ActionEvent e) {
-        if (!isPlaying) {
-            JButton button = (JButton) e.getSource();
-            int x = button.getY() / CELL_SIZE;
-            int y = button.getX() / CELL_SIZE;
-
-            currentState[x][y] ^= 1;
-            button.setBackground(currentState[x][y] == 1 ? Color.BLACK : Color.WHITE);
         }
     }
 
